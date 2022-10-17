@@ -10,6 +10,30 @@ const router = express.Router();
 /**
  * Give or take away credit.
  *
+ * @name GET /api/credits
+ *
+ * @return {util.CreditResponse} - An object with your credit
+ * @throws {403} - If no user is logged in
+ *
+ */
+ router.get(
+  '/',
+  [
+    userValidator.isUserLoggedIn,
+  ],
+  async (req: Request, res: Response) => {
+    const uid = req.session.userId as string;
+    const credit = await CreditCollection.findOneByUserId(uid);
+    res.status(200).json({
+      message: 'Here is your credit.',
+      credit: util.constructCreditResponse(credit),
+    });
+  }
+);
+
+/**
+ * Give or take away credit.
+ *
  * @name PUT /api/credits
  *
  * @param {string} other_username - The username of the user whose credit is being changed
@@ -29,11 +53,11 @@ const router = express.Router();
   async (req: Request, res: Response) => {
     const uid = req.session.userId as string;
     const other_uid = (await CreditCollection.findOneByUsername(req.body.other_username)).associated_user;
-    const creditObj = await CreditCollection.updateCreditScore(uid, other_uid);
+    const twoCreditObj = await CreditCollection.updateCreditScore(uid, other_uid);
     res.status(200).json({
       message: 'Credit updated successfully.',
-      credit: util.constructCreditResponse(creditObj.credit),
-      otherCredit: util.constructCreditResponse(creditObj.otherCredit)
+      credit: util.constructCreditResponse(twoCreditObj.credit),
+      otherCredit: util.constructCreditResponse(twoCreditObj.otherCredit)
     });
   }
 );

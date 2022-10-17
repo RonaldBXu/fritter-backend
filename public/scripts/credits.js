@@ -10,3 +10,9 @@ function modifyCredit(fields) {
     .then(showResponse)
     .catch(showResponse);
 }
+
+function getCredit(fields) {
+  fetch('/api/credits')
+    .then(showResponse)
+    .catch(showResponse);
+}

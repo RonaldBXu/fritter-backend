@@ -40,6 +40,7 @@ const formsAndHandlers = {
   'edit-freet': editFreet,
   'delete-freet': deleteFreet,
   'modify-credit': modifyCredit,
+  'get-credit': getCredit,
 };
 
 // Attach handlers to forms

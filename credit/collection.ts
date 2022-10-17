@@ -35,6 +35,16 @@ class CreditCollection {
     return credit !== null;
   }
 
+ /**
+   * Find a credit by userId.
+   *
+   * @param {string} userId - The username of the user of the credit to find
+   * @return {Promise<Credit> | Promise<null>} - The user id of the credit with the given username, if any
+   */
+     static async findOneByUserId(userId: string): Promise<HydratedDocument<Credit>> {
+      return CreditModel.findOne({ associated_user: userId });
+    }
+
   /**
    * Find a credit by username.
    *
