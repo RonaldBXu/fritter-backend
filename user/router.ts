@@ -2,8 +2,10 @@ import type {Request, Response} from 'express';
 import express from 'express';
 import FreetCollection from '../freet/collection';
 import UserCollection from './collection';
+import CreditCollection from '../credit/collection';
 import * as userValidator from '../user/middleware';
 import * as util from './util';
+import * as creditUtil from '../credit/util';
 
 const router = express.Router();
 
@@ -86,10 +88,13 @@ router.post(
   ],
   async (req: Request, res: Response) => {
     const user = await UserCollection.addOne(req.body.username, req.body.password);
-    req.session.userId = user._id.toString();
+    const uid = user._id.toString();
+    req.session.userId = uid;
+    const credit = await CreditCollection.addOne(uid);
     res.status(201).json({
       message: `Your account was created successfully. You have been logged in as ${user.username}`,
-      user: util.constructUserResponse(user)
+      user: util.constructUserResponse(user),
+      credit: creditUtil.constructCreditResponse(credit),
     });
   }
 );
@@ -141,6 +146,7 @@ router.delete(
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
     await UserCollection.deleteOne(userId);
     await FreetCollection.deleteMany(userId);
+    await CreditCollection.deleteOne(userId);
     req.session.userId = undefined;
     res.status(200).json({
       message: 'Your account has been deleted successfully.'

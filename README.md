@@ -169,17 +169,21 @@ within the schema. This tells us that the `content` field must have type `String
 
 ## API routes
 
-The following api routes have already been implemented for you (**Make sure to document all the routes that you have added.**):
-
 #### `GET /`
 
 This renders the `index.html` file that will be used to interact with the backend
+
+<br>
+
+### Freet API Routes
 
 #### `GET /api/freets` - Get all the freets
 
 **Returns**
 
 - An array of all freets sorted in descending order by date modified
+
+<br>
 
 #### `GET /api/freets?author=USERNAME` - Get freets by author
 
@@ -192,6 +196,8 @@ This renders the `index.html` file that will be used to interact with the backen
 - `400` if `author` is not given
 - `404` if `author` is not a recognized username of any user
 
+<br>
+
 #### `POST /api/freets` - Create a new freet
 
 **Body**
@@ -201,13 +207,15 @@ This renders the `index.html` file that will be used to interact with the backen
 **Returns**
 
 - A success message
-- A object with the created freet
+- An object with the created freet and an object with the created cooldown
 
 **Throws**
 
 - `403` if the user is not logged in
-- `400` If the freet content is empty or a stream of empty spaces
-- `413` If the freet content is more than 140 characters long
+- `400` if the freet content is empty or a stream of empty spaces
+- `413` if the freet content is more than 140 characters long
+
+<br>
 
 #### `DELETE /api/freets/:freetId?` - Delete an existing freet
 
@@ -220,6 +228,8 @@ This renders the `index.html` file that will be used to interact with the backen
 - `403` if the user is not logged in
 - `403` if the user is not the author of the freet
 - `404` if the freetId is invalid
+
+<br>
 
 #### `PUT /api/freets/:freetId?` - Update an existing freet
 
@@ -240,6 +250,10 @@ This renders the `index.html` file that will be used to interact with the backen
 - `400` if the new freet content is empty or a stream of empty spaces
 - `413` if the new freet content is more than 140 characters long
 
+<br>
+
+### Users API Routes
+
 #### `POST /api/users/session` - Sign in user
 
 **Body**
@@ -258,6 +272,8 @@ This renders the `index.html` file that will be used to interact with the backen
 - `400` if username or password is not in correct format format or missing in the req
 - `401` if the user login credentials are invalid
 
+<br>
+
 #### `DELETE /api/users/session` - Sign out user
 
 **Returns**
@@ -267,6 +283,8 @@ This renders the `index.html` file that will be used to interact with the backen
 **Throws**
 
 - `403` if user is not logged in
+
+<br>
 
 #### `POST /api/users` - Create an new user account
 
@@ -278,13 +296,15 @@ This renders the `index.html` file that will be used to interact with the backen
 **Returns**
 
 - A success message
-- An object with the created user's details (without password)
+- An object with the created user's details (without password) and an object with the created user's credit
 
 **Throws**
 
 - `403` if there is a user already logged in
 - `400` if username or password is in the wrong format
 - `409` if username is already in use
+
+<br>
 
 #### `PUT /api/users` - Update a user's profile
 
@@ -304,11 +324,211 @@ This renders the `index.html` file that will be used to interact with the backen
 - `400` if username or password is in the wrong format
 - `409` if the username is already in use
 
+<br>
+
 #### `DELETE /api/users` - Delete user
 
 **Returns**
 
 - A success message
+
+**Throws**
+
+- `403` if the user is not logged in
+
+<br>
+
+#### `GET /api/users` - Get a user object
+
+**Body**
+
+- `user_id` _{string}_ - The associated user id of the credit object to get
+
+**Returns**
+
+- A user object with userId `user_id`
+
+**Throws**
+
+- `400` if `user_id` is not given
+- `404` if the user with `user_id` does not exist
+
+<br>
+
+### Credits API Routes
+
+We do not have (nor need) as POST route for Credits. This is because Credits are initialized when a User is created, so it (Credits) only needs to be updated or fetched.
+
+#### `GET /api/credits` - Get a credit object
+
+**Body**
+
+- `user_id` _{string}_ - The associated user id of the credit object to get
+
+**Returns**
+
+- A credit object with associated user `user_id`
+
+**Throws**
+
+- `400` if `user_id` is not given
+- `404` if the credit object with associated user `user_id` does not exist
+
+<br>
+
+#### `PUT /api/credits` - Give or take away credit
+
+**Body**
+
+- `other_username` _{string}_ - the username of the user receiving/losing credit
+
+**Returns**
+
+- A success message
+- An object with the updated credit details of both users
+
+**Throws**
+
+- `403` if the user is not logged in
+- `404` if either of the users credit object is not found
+- `412` if the user who is giving/removing credit is the same as the user whose credit is changing
+
+<br>
+
+### Cooldowns API Routes
+
+We do not have (nor need) as POST route for Cooldowns. This is because Cooldowns are initialized when a Freet is created, so it (Cooldowns) only needs to be updated or fetched.
+
+#### `GET /api/cooldowns` - Get a cooldown object
+
+**Body**
+
+- `freet_id` _{string}_ - The associated freet id of the cooldown object to get
+
+**Returns**
+
+- A cooldown object with associated freet `freet_id`
+
+**Throws**
+
+- `400` if `freet_id` is not given
+- `404` if the cooldown object with associated freet `freet_id` does not exist
+
+<br>
+
+#### `PUT /api/cooldowns` - Modify a cooldown object
+
+**Body**
+
+- `freet_id` _{string}_ - the id of the freet being accessed
+- `viewing_user` _{string}_ - the id of the user viewing the freet
+- `provocative` _{boolean}_ - true iff the user marked the associated freet as provocative
+
+Note: Database contains 2 arrays: One of all viewed users, and one of all users that marked this freet as provocative.
+
+**Returns**
+
+- A success message
+- An object with the updated cooldown details
+
+**Throws**
+
+- `403` if the user is not logged in
+- `404` if either of the users credit object is not found
+
+<br>
+
+### Scheduled Freets API Routes
+
+#### `GET /api/scheduledFreets` - Get a scheduled freet object
+
+**Body**
+
+- `scheduledFreet_id` _{string}_ - The scheduled freet id of the scheduled freet to get
+
+**Returns**
+
+- A scheduled freet object with id `scheduledFreet_id`
+
+**Throws**
+
+- `400` if `scheduledFreet_id` is not given
+- `404` if the scheduled freet with id `scheduledFreet_id` does not exist
+
+<br>
+
+#### `POST /api/scheduledFreets` - Create a new scheduled freet
+
+**Body**
+
+- `content` _{string}_ - The content of the freet
+- `publish_date` _{date}_ - The publish date of this freet
+
+**Returns**
+
+- A success message
+- An object with the created scheduled freet
+
+**Throws**
+
+- `403` if the user is not logged in
+- `400` if the freet content is empty or a stream of empty spaces
+- `412` if the publish date is in the past
+- `413` if the freet content is more than 140 characters long
+
+<br>
+
+### Reflections API Routes
+
+#### `GET /api/reflection` - Get a reflection object
+
+**Body**
+
+- `freet_id` _{string}_ - The freet id associated with this reflection
+- `user_id` _{string}_ - The username of the user associated with this reflection
+
+**Returns**
+
+- A reflection object with associated freet id `freet_id` and associated user id `user_id`
+
+**Throws**
+
+- `400` if `freet_id` or `user_id` is not given
+- `404` if the freet object with associated user `user_id` and `freet_id` does not exist
+
+<br>
+
+#### `POST /api/reflections` - Create a new reflection
+
+**Body**
+
+- `content` _{string}_ - The content of the reflection
+- `freet_id` _{string}_ - The freet id associated with this reflection
+- `username` _{string}_ - The username of the user writing this reflection
+
+**Returns**
+
+- A success message
+- An object with the created reflection
+
+**Throws**
+
+- `403` if the user is not logged in
+- `400` If the reflection content is empty or a stream of empty spaces
+
+<br>
+
+#### `PUT /api/reflections` - Change the visibility of a reflection
+
+**Body**
+
+- `reflection_id` _{string}_ - The id of the reflection being edited
+- `public` _{boolean}_ - Whether user wants the reflection to be publicly viewable or not
+
+**Returns**
+
+- A success message
+- An object with the updated reflection
 
 **Throws**
 
