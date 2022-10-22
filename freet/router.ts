@@ -94,7 +94,7 @@ router.delete(
     freetValidator.isValidFreetModifier
   ],
   async (req: Request, res: Response) => {
-    await FreetCollection.deleteOne(req.params.freetId);
+    await FreetCollection.deleteOne((await FreetCollection.findOne(req.params.freetId))._id);
     res.status(200).json({
       message: 'Your freet was deleted successfully.'
     });
@@ -127,6 +127,29 @@ router.put(
     res.status(200).json({
       message: 'Your freet was updated successfully.',
       freet: util.constructFreetResponse(freet)
+    });
+  }
+);
+
+/**
+ * View Freet
+ *
+ * @name GET /api/freets/:id
+ *
+ * @return {util.FreetResponse} - An object with freet info
+ * @throws {404} - If no freet object with freet id id exists
+ *
+ */
+ router.get(
+  '/:freetId?',
+  [
+    freetValidator.isFreetExists,
+  ],
+  async (req: Request, res: Response) => {
+    const freet = await FreetCollection.findOne(req.params.freetId);
+    res.status(200).json({
+      message: 'Here is the freet object.',
+      credit: util.constructFreetResponse(freet),
     });
   }
 );

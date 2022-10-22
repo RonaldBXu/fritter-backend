@@ -1,4 +1,4 @@
-import type {HydratedDocument} from 'mongoose';
+import type {HydratedDocument, Types} from 'mongoose';
 import type {Credit} from './model';
 
 // Update this if you add a property to the Credit type!
@@ -6,7 +6,7 @@ type CreditResponse = {
   _id: string;
   associated_user: string;
   credit: number;
-  credit_given: Array<string>;
+  credit_given: Array<Types.ObjectId>;
 };
 
 /**
@@ -25,7 +25,7 @@ const constructCreditResponse = (credit: HydratedDocument<Credit>): CreditRespon
   };
   return {
     _id: creditCopy._id.toString(),
-    associated_user: creditCopy.associated_user,
+    associated_user: creditCopy.associated_user.toString(),
     credit: creditCopy.credit,
     credit_given: creditCopy.credit_given,
   };

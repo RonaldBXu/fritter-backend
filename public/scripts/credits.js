@@ -6,13 +6,13 @@
  */
 
 function modifyCredit(fields) {
-  fetch('/api/credits', {method: 'PUT', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}})
+  fetch(`/api/credits/${fields.other_username}`, {method: 'PUT', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}})
     .then(showResponse)
     .catch(showResponse);
 }
 
 function getCredit(fields) {
-  fetch('/api/credits')
+  fetch(`/api/credits/${fields.id}`)
     .then(showResponse)
     .catch(showResponse);
 }

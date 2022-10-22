@@ -8,8 +8,8 @@ import CreditCollection from './collection';
  */
  const doesOtherUserExist = async (req: Request, res: Response, next: NextFunction) => {
   let user = undefined;
-  if (req.body.other_username) {
-    user = await UserCollection.findOneByUsername(req.body.other_username);
+  if (req.params.otherUserId) {
+    user = await UserCollection.findOneByUsername(req.params.otherUserId);
   }
   if (!user) {
     res.status(404).json({
@@ -26,7 +26,7 @@ import CreditCollection from './collection';
  * Makes sure that the other user is not yourself.
  */
  const isOtherUserMe = async (req: Request, res: Response, next: NextFunction) => {
-  const other_user = await UserCollection.findOneByUsername(req.body.other_username);
+  const other_user = await UserCollection.findOneByUsername(req.params.otherUserId);
   if (other_user._id.toString() === req.session.userId) {
     res.status(412).json({
       error: {
@@ -38,7 +38,27 @@ import CreditCollection from './collection';
   next();
 };
 
+/**
+ * Checks if a credit object with associated user id id exists
+ */
+ const doesCreditExist = async (req: Request, res: Response, next: NextFunction) => {
+  let user = undefined;
+  if (req.params.userId) {
+    user = await CreditCollection.findOneByUserId(req.params.userId);
+  }
+  if (!user) {
+    res.status(404).json({
+      error: {
+        creditNotFound: 'Credit object was not found.'
+      }
+    });
+    return;
+  }
+  next();
+};
+
 export {
   doesOtherUserExist,
   isOtherUserMe,
+  doesCreditExist,
 };

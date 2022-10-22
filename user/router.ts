@@ -90,7 +90,7 @@ router.post(
     const user = await UserCollection.addOne(req.body.username, req.body.password);
     const uid = user._id.toString();
     req.session.userId = uid;
-    const credit = await CreditCollection.addOne(uid);
+    const credit = await CreditCollection.addOne(user._id);
     res.status(201).json({
       message: `Your account was created successfully. You have been logged in as ${user.username}`,
       user: util.constructUserResponse(user),
@@ -143,13 +143,37 @@ router.delete(
     userValidator.isUserLoggedIn
   ],
   async (req: Request, res: Response) => {
-    const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
+    const userId = (await UserCollection.findOneByUserId(req.session.userId))._id;
     await UserCollection.deleteOne(userId);
     await FreetCollection.deleteMany(userId);
     await CreditCollection.deleteOne(userId);
     req.session.userId = undefined;
     res.status(200).json({
       message: 'Your account has been deleted successfully.'
+    });
+  }
+);
+
+/**
+ * View User
+ *
+ * @name GET /api/users/:id
+ *
+ * @return {util.UserResponse} - An object with user info
+ * @throws {404} - If no user object with user id id exists
+ *
+ */
+ router.get(
+  '/:userId?',
+  [
+    userValidator.doesUserExist,
+  ],
+  async (req: Request, res: Response) => {
+    const uid = req.params.userId as string;
+    const user = await UserCollection.findOneByUserId(uid);
+    res.status(200).json({
+      message: 'Here is the user object.',
+      credit: util.constructUserResponse(user),
     });
   }
 );

@@ -40,3 +40,9 @@ function signOut() {
     .then(showResponse)
     .catch(showResponse);
 }
+
+function getUser(fields) {
+  fetch(`/api/users/${fields.id}`)
+    .then(showResponse)
+    .catch(showResponse);
+}

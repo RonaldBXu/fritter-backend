@@ -15,10 +15,10 @@ class CreditCollection {
   /**
    * Add a new credit
    *
-   * @param {string} uid - The user id of the user
+   * @param {Types.ObjectId} uid - The user id of the user
    * @return {Promise<HydratedDocument<Credit>>} - The newly created Credit
    */
-  static async addOne(uid: string): Promise<HydratedDocument<Credit>> {
+  static async addOne(uid: Types.ObjectId): Promise<HydratedDocument<Credit>> {
     const credit = new CreditModel({ associated_user: uid, credit: 0, credit_given: [] });
     await credit.save(); // Saves user to MongoDB
     return credit;
@@ -27,23 +27,23 @@ class CreditCollection {
   /**
    * Delete credit
    *
-   * @param {string} uid - The user id associated with the credit
+   * @param {Types.ObjectId} uid - The user id associated with the credit
    * @return {Promise<Boolean>} - true if the credit has been deleted, false otherwise
    */
-  static async deleteOne(uid: string): Promise<boolean> {
+  static async deleteOne(uid: Types.ObjectId): Promise<boolean> {
     const credit = await CreditModel.deleteOne({ associated_user: uid });
     return credit !== null;
   }
 
- /**
-   * Find a credit by userId.
-   *
-   * @param {string} userId - The username of the user of the credit to find
-   * @return {Promise<Credit> | Promise<null>} - The user id of the credit with the given username, if any
-   */
-     static async findOneByUserId(userId: string): Promise<HydratedDocument<Credit>> {
-      return CreditModel.findOne({ associated_user: userId });
-    }
+  /**
+    * Find a credit by userId.
+    *
+    * @param {string} userId - The user id of the user of the credit to find
+    * @return {Promise<Credit> | Promise<null>} - The user id of the credit with the given username, if any
+    */
+  static async findOneByUserId(userId: string): Promise<HydratedDocument<Credit>> {
+    return CreditModel.findOne({ associated_user: userId });
+  }
 
   /**
    * Find a credit by username.
@@ -59,10 +59,10 @@ class CreditCollection {
   /**
     * Update credit score because a post was marked as inflammatory
     *
-    * @param {string} uid - The associated user id of the credit to update
+    * @param {Types.ObjectId} uid - The associated user id of the credit to update
     * @return {Promise<HydratedDocument<Credit>>} - The updated credit
     */
-  static async updateInflam(uid: string): Promise<HydratedDocument<Credit>> {
+  static async updateInflam(uid: Types.ObjectId): Promise<HydratedDocument<Credit>> {
     const credit = await CreditModel.findOne({ associated_user: uid });
     credit.credit = (credit.credit as number) * 0.9;
     await credit.save();
@@ -72,11 +72,11 @@ class CreditCollection {
   /**
     * Update credit score because a post's inflammatory designation was removed
     *
-    * @param {string} uid - The associated user id of the credit to update
+    * @param {Types.ObjectId} uid - The associated user id of the credit to update
     * @return {Promise<HydratedDocument<Credit>>} - The updated credit
     */
-  static async updateNotInflam(creditId: string): Promise<HydratedDocument<Credit>> {
-    const credit = await CreditModel.findOne({ associated_user: creditId });
+  static async updateNotInflam(uid: Types.ObjectId): Promise<HydratedDocument<Credit>> {
+    const credit = await CreditModel.findOne({ associated_user: uid });
     credit.credit = (credit.credit as number) * 1.11;
     await credit.save();
     return credit;
@@ -89,7 +89,7 @@ class CreditCollection {
    * @param {string} other_uid - The associated user id of the person whose credit is being changed
    * @return {Promise<HydratedDocument<Credit>>} - The updated credit
    */
-  static async updateCreditScore(uid: string, other_uid: string): Promise<{ credit: HydratedDocument<Credit>, otherCredit: HydratedDocument<Credit> }> {
+  static async updateCreditScore(uid: Types.ObjectId, other_uid: Types.ObjectId): Promise<{ credit: HydratedDocument<Credit>, otherCredit: HydratedDocument<Credit> }> {
     const credit = await CreditModel.findOne({ associated_user: uid });
     const otherCredit = await CreditModel.findOne({ associated_user: other_uid });
     if (credit.credit_given.includes(other_uid)) {

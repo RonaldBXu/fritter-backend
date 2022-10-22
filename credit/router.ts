@@ -8,24 +8,24 @@ import * as util from './util';
 const router = express.Router();
 
 /**
- * Give or take away credit.
+ * View Credit
  *
- * @name GET /api/credits
+ * @name GET /api/credits/:id
  *
  * @return {util.CreditResponse} - An object with your credit
- * @throws {403} - If no user is logged in
+ * @throws {404} - If no credit object with associated user id id exists
  *
  */
  router.get(
-  '/',
+  '/:userId?',
   [
-    userValidator.isUserLoggedIn,
+    creditValidator.doesCreditExist,
   ],
   async (req: Request, res: Response) => {
-    const uid = req.session.userId as string;
+    const uid = req.params.userId as string;
     const credit = await CreditCollection.findOneByUserId(uid);
     res.status(200).json({
-      message: 'Here is your credit.',
+      message: 'Here is the credit object.',
       credit: util.constructCreditResponse(credit),
     });
   }
@@ -34,9 +34,8 @@ const router = express.Router();
 /**
  * Give or take away credit.
  *
- * @name PUT /api/credits
+ * @name PUT /api/credits/:other_username
  *
- * @param {string} other_username - The username of the user whose credit is being changed
  * @return {credit: util.CreditResponse, otherCredit: util.CreditResponse} - An object with updated credit and otherCredit objects
  * @throws {403} - If no user is logged in
  * @throws {404} - If user who is giving/removing credit or user whose credit is changing is not found
@@ -44,15 +43,15 @@ const router = express.Router();
  *
  */
  router.put(
-  '/',
+  '/:otherUserId?',
   [
     userValidator.isUserLoggedIn,
     creditValidator.doesOtherUserExist,
     creditValidator.isOtherUserMe,
   ],
   async (req: Request, res: Response) => {
-    const uid = req.session.userId as string;
-    const other_uid = (await CreditCollection.findOneByUsername(req.body.other_username)).associated_user;
+    const uid = (await CreditCollection.findOneByUserId(req.session.userId)).associated_user;
+    const other_uid = (await CreditCollection.findOneByUsername(req.params.otherUserId)).associated_user;
     const twoCreditObj = await CreditCollection.updateCreditScore(uid, other_uid);
     res.status(200).json({
       message: 'Credit updated successfully.',

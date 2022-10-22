@@ -1,4 +1,4 @@
-import type {Types} from 'mongoose';
+import {Types} from 'mongoose';
 import {Schema, model} from 'mongoose';
 
 /**
@@ -9,9 +9,9 @@ import {Schema, model} from 'mongoose';
 // Type definition for User on the backend
 export type Credit = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
-  associated_user: string;
+  associated_user: Types.ObjectId;
   credit: number;
-  credit_given: Array<string>;
+  credit_given: Array<Types.ObjectId>;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -20,7 +20,7 @@ export type Credit = {
 const CreditSchema = new Schema<Credit>({
   // The user's username
   associated_user: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true
   },
   // The user's password
@@ -30,7 +30,7 @@ const CreditSchema = new Schema<Credit>({
   },
   // The date the user joined
   credit_given: {
-    type: [String],
+    type: [Schema.Types.ObjectId],
     required: true
   }
 });

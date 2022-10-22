@@ -153,6 +153,25 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
   next();
 };
 
+/**
+ * Checks if a user object with user id id exists
+ */
+ const doesUserExist = async (req: Request, res: Response, next: NextFunction) => {
+  let user = undefined;
+  if (req.params.userId) {
+    user = await UserCollection.findOneByUserId(req.params.userId);
+  }
+  if (!user) {
+    res.status(404).json({
+      error: {
+        userNotFound: 'user object was not found.'
+      }
+    });
+    return;
+  }
+  next();
+};
+
 export {
   isCurrentSessionUserExists,
   isUserLoggedIn,
@@ -162,4 +181,5 @@ export {
   isAuthorExists,
   isValidUsername,
   isValidPassword,
+  doesUserExist,
 };
