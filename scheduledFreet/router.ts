@@ -13,14 +13,14 @@ const router = express.Router();
  *
  * @name GET /api/scheduledfreets
  *
- * @return {ScheduledFreetResponse[]} - A list of all the scheduled freets 
+ * @return {util.ScheduledFreetResponse[]} - A list of all the scheduled freets 
  */
 /**
  * Get scheduled freets by author.
  *
  * @name GET /api/scheduledfreets?authorId=id
  *
- * @return {ScheduledFreetResponse[]} - An array of scheduled freets created by user with id, authorId
+ * @return {util.ScheduledFreetResponse[]} - An array of scheduled freets created by user with id, authorId
  * @throws {400} - If authorId is not given
  * @throws {404} - If no user has given authorId
  *
@@ -55,7 +55,7 @@ router.get(
  *
  * @param {string} content - The content of the freet
  * @param {Date} publish_date
- * @return {ScheduledFreetResponse} - The created freet
+ * @return {util.ScheduledFreetResponse} - The created freet
  * @throws {403} - If the user is not logged in
  * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {413} - If the freet content is more than 140 characters long

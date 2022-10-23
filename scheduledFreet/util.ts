@@ -33,7 +33,9 @@ const formatStringToDate = (date: string): Date => moment(date).toDate();
 * @returns {boolean} - if this is a valid date
 */
 const validDate = (date: string): boolean => {
-  return moment(date, "MM-DD-YYYY").isValid()
+  
+  const testDate = moment(date, "MM-DD-YYYY", true)
+  return !(testDate == null || !testDate.isValid())
 }
 
 /**
@@ -72,4 +74,6 @@ export {
   formatStringToDate,
   validDate,
   today,
+  ScheduledFreetResponse,
+
 };

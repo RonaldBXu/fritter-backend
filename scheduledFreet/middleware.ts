@@ -63,8 +63,12 @@ const isValidScheduledFreetModifier = async (req: Request, res: Response, next: 
  * Checks if the publish_date is valid in req.params
  */
 const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
-  // I will not check whether the date itself is in a valid format. 
-  // The frontend can handle that. I will give users a calendar so they cannot enter the date wrong.
+  if (!util.validDate(req.body.publish_date)){
+    res.status(412).json({
+      error: 'Please enter date in MM-DD-YYYY format.'
+    });
+    return;
+  }
   const date = util.formatStringToDate(req.body.publish_date);
   const currDate = util.today();
   if (date.getTime() <= currDate.getTime()) {
