@@ -138,4 +138,4 @@ router.put(
   }
 );
 
-export { router as scheduledFreetsRouter };
+export { router as scheduledFreetRouter };

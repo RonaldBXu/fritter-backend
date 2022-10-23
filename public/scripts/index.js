@@ -48,6 +48,11 @@ const formsAndHandlers = {
   'create-scheduled-freet': createScheduledFreet,
   'edit-scheduled-freet': editScheduledFreet,
   'delete-scheduled-freet': deleteScheduledFreet,
+  'get-cooldown': getCooldown,
+  'view-freet-cooldown': viewFreetCooldown,
+  'create-reflection': createReflection,
+  'get-user-reflections': getUserReflections,
+  'edit-reflection': editReflection,
 };
 
 // Attach handlers to forms

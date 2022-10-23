@@ -4,6 +4,7 @@ import FreetCollection from './collection';
 import * as userValidator from '../user/middleware';
 import * as freetValidator from '../freet/middleware';
 import * as util from './util';
+import CooldownCollection from 'cooldown/collection';
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ const router = express.Router();
 /**
  * Get freets by author.
  *
- * @name GET /api/freets?authorId=id
+ * @name GET /api/freets?author=id
  *
  * @return {FreetResponse[]} - An array of freets created by user with id, authorId
  * @throws {400} - If authorId is not given
@@ -75,7 +76,7 @@ router.post(
     } else {
       freet = await FreetCollection.addOne(userId, req.body.content);
     }
-
+    await CooldownCollection.addOne(freet._id);
     res.status(201).json({
       message: 'Your freet was created successfully.',
       freet: util.constructFreetResponse(freet)

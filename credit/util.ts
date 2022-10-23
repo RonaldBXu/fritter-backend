@@ -15,7 +15,7 @@ type CreditResponse = {
  * (in this case, removing the password for security)
  *
  * @param {HydratedDocument<Credit>} credit - A credit object
- * @returns {UserResponse} - The user object without the password
+ * @returns {CooldownResponse} - The user object without the password
  */
 const constructCreditResponse = (credit: HydratedDocument<Credit>): CreditResponse => {
   const creditCopy: Credit = {
