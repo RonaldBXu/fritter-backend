@@ -59,8 +59,29 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
   next();
 };
 
+/**
+ * Checks if the replying id is valid, if it exists
+ */
+ const isValidReplyingFreet = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.replyingTo){
+    const validFormat = Types.ObjectId.isValid(req.body.replyingTo);
+    const freet = validFormat ? await FreetCollection.findOne(req.body.replyingTo) : '';
+    if (!freet) {
+      res.status(404).json({
+        error: {
+          freetNotFound: `Freet with freet ID ${req.body.replyingTo} does not exist.`
+        }
+      });
+      return;
+    }
+  }
+
+  next();
+};
+
 export {
   isValidFreetContent,
   isFreetExists,
-  isValidFreetModifier
+  isValidFreetModifier,
+  isValidReplyingFreet,
 };

@@ -1,4 +1,4 @@
-import type {NextFunction, Request, Response} from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import express from 'express';
 import FreetCollection from './collection';
 import * as userValidator from '../user/middleware';
@@ -54,6 +54,7 @@ router.get(
  * @name POST /api/freets
  *
  * @param {string} content - The content of the freet
+ * @param {string} replyingTo - The id of the freet that this freet is replying to
  * @return {FreetResponse} - The created freet
  * @throws {403} - If the user is not logged in
  * @throws {400} - If the freet content is empty or a stream of empty spaces
@@ -63,16 +64,24 @@ router.post(
   '/',
   [
     userValidator.isUserLoggedIn,
-    freetValidator.isValidFreetContent
+    freetValidator.isValidFreetContent,
+    freetValidator.isValidReplyingFreet,
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const freet = await FreetCollection.addOne(userId, req.body.content);
+    let freet;
+    if (req.body.replyingTo.length !== 0) {
+      freet = await FreetCollection.addReply(userId, req.body.content, req.body.replyingTo);
+    } else {
+      freet = await FreetCollection.addOne(userId, req.body.content);
+    }
 
     res.status(201).json({
       message: 'Your freet was created successfully.',
       freet: util.constructFreetResponse(freet)
     });
+    return;
+
   }
 );
 
@@ -81,7 +90,7 @@ router.post(
  *
  * @name DELETE /api/freets/:id
  *
- * @return {string} - A success message
+ * @return {string} - A success message and the "deleted" freet
  * @throws {403} - If the user is not logged in or is not the author of
  *                 the freet
  * @throws {404} - If the freetId is not valid
@@ -94,9 +103,10 @@ router.delete(
     freetValidator.isValidFreetModifier
   ],
   async (req: Request, res: Response) => {
-    await FreetCollection.deleteOne((await FreetCollection.findOne(req.params.freetId))._id);
+    const freet = await FreetCollection.safeDeleteOne((await FreetCollection.findOne(req.params.freetId))._id);
     res.status(200).json({
-      message: 'Your freet was deleted successfully.'
+      message: 'Your freet was deleted successfully.',
+      freet: util.constructFreetResponse(freet)
     });
   }
 );
@@ -140,18 +150,18 @@ router.put(
  * @throws {404} - If no freet object with freet id id exists
  *
  */
- router.get(
+router.get(
   '/:freetId?',
   [
     freetValidator.isFreetExists,
   ],
   async (req: Request, res: Response) => {
-    const freet = await FreetCollection.findOne(req.params.freetId);
+    const freetThread = await FreetCollection.findThread(req.params.freetId);
     res.status(200).json({
       message: 'Here is the freet object.',
-      credit: util.constructFreetResponse(freet),
+      thread: freetThread,
     });
   }
 );
 
-export {router as freetRouter};
+export { router as freetRouter };

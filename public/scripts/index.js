@@ -43,6 +43,11 @@ const formsAndHandlers = {
   'get-credit': getCredit,
   'get-user': getUser,
   'get-freet': getFreet,
+  'view-all-scheduled-freets': viewAllScheduledFreets,
+  'view-scheduled-freets-by-author': viewScheduledFreetsByAuthor,
+  'create-scheduled-freet': createScheduledFreet,
+  'edit-scheduled-freet': editScheduledFreet,
+  'delete-scheduled-freet': deleteScheduledFreet,
 };
 
 // Attach handlers to forms

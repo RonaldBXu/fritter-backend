@@ -173,7 +173,7 @@ router.delete(
     const user = await UserCollection.findOneByUserId(uid);
     res.status(200).json({
       message: 'Here is the user object.',
-      credit: util.constructUserResponse(user),
+      user: util.constructUserResponse(user),
     });
   }
 );

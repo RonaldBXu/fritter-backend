@@ -17,6 +17,30 @@ class FreetCollection {
    *
    * @param {string} authorId - The id of the author of the freet
    * @param {string} content - The id of the content of the freet
+   * @param {string} replyingTo - the id of the freet that this freet is replying to
+   * @return {Promise<HydratedDocument<Freet>>} - The newly created freet
+   */
+  static async addReply(authorId: Types.ObjectId | string, content: string, replyingTo: Types.ObjectId): Promise<HydratedDocument<Freet>> {
+    const date = new Date();
+    const freet = new FreetModel({
+      authorId,
+      dateCreated: date,
+      content,
+      dateModified: date,
+      replies: [],
+    });
+    await freet.save();
+    const parentFreet = await this.findOne(replyingTo);
+    parentFreet.replies.push(freet._id);
+    await parentFreet.save()
+    return freet.populate('authorId');
+  }
+
+  /**
+   * Add a freet to the collection
+   *
+   * @param {string} authorId - The id of the author of the freet
+   * @param {string} content - The id of the content of the freet
    * @return {Promise<HydratedDocument<Freet>>} - The newly created freet
    */
   static async addOne(authorId: Types.ObjectId | string, content: string): Promise<HydratedDocument<Freet>> {
@@ -95,7 +119,6 @@ class FreetCollection {
    * @return {Promise<Boolean>} - true if the freet has been deleted, false otherwise
    */
   static async deleteOne(freetId: Types.ObjectId): Promise<boolean> {
-    await this.deleteReplies(freetId);
     const freet = await FreetModel.deleteOne({ _id: freetId });
     return freet !== null;
   }
@@ -106,24 +129,39 @@ class FreetCollection {
    * @param {string} authorId - The id of author of freets
    */
   static async deleteMany(authorId: Types.ObjectId): Promise<void> {
-    const authoredFreets = await this.findAllByUserId(authorId);
-    for (const ft of authoredFreets){
-      await this.deleteReplies(ft._id)
-    }
     await FreetModel.deleteMany({ authorId });
   }
 
   /**
-   * Delete all the freets replying to a freet
+   * Safe delete a freet with given freetId.
    *
-   * @param {string} freetId - The id of the freet
+   * @param {string} freetId - The freetId of freet to delete
+   * @return {Promise<HydratedDocument<Freet>>} - The newly "deleted" freet
    */
-  static async deleteReplies(freetId: Types.ObjectId): Promise<void> {
-    const curr = await this.findOne(freetId);
-    for (const fid of curr.replies) {
-      this.deleteOne(fid);
-    }
+  static async safeDeleteOne(freetId: Types.ObjectId): Promise<HydratedDocument<Freet>> {
+    const freet = await FreetModel.findOne({ _id: freetId });
+    freet.content = 'This freet has been deleted.';
+    freet.dateModified = new Date();
+    await freet.save();
+    return freet.populate('authorId');
   }
+
+  /**
+   * Build the thread for a freet
+   *
+   * @param {string} freetId - The freetId of freet we are finding
+   * @return {Promise<HydratedDocument<Freet>>} - The thread for a freet
+   */
+   static async findThread(freetId: Types.ObjectId | string): Promise<Array<HydratedDocument<Freet>>> {
+    let freet = await this.findOne(freetId);
+    const thread = [freet];
+    for (const childFreet of freet.replies){
+      const childThread = await this.findThread(childFreet);
+      thread.push(...childThread);
+    }
+    return thread;
+  }
+
 }
 
 export default FreetCollection;
