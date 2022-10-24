@@ -4,7 +4,7 @@ import FreetCollection from './collection';
 import * as userValidator from '../user/middleware';
 import * as freetValidator from '../freet/middleware';
 import * as util from './util';
-import CooldownCollection from 'cooldown/collection';
+import CooldownCollection from '../cooldown/collection';
 
 const router = express.Router();
 
@@ -92,6 +92,7 @@ router.post(
  * @name DELETE /api/freets/:id
  *
  * @return {string} - A success message and the "deleted" freet
+ * @throws {400} - If freetId is empty
  * @throws {403} - If the user is not logged in or is not the author of
  *                 the freet
  * @throws {404} - If the freetId is not valid
@@ -99,6 +100,7 @@ router.post(
 router.delete(
   '/:freetId?',
   [
+    freetValidator.nullFreet,
     userValidator.isUserLoggedIn,
     freetValidator.isFreetExists,
     freetValidator.isValidFreetModifier
@@ -119,15 +121,17 @@ router.delete(
  *
  * @param {string} content - the new content for the freet
  * @return {FreetResponse} - the updated freet
+ * @throws {400} - if freetId is empty
+ * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {403} - if the user is not logged in or not the author of
  *                 of the freet
  * @throws {404} - If the freetId is not valid
- * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {413} - If the freet content is more than 140 characters long
  */
 router.put(
   '/:freetId?',
   [
+    freetValidator.nullFreet,
     userValidator.isUserLoggedIn,
     freetValidator.isFreetExists,
     freetValidator.isValidFreetModifier,
@@ -148,12 +152,14 @@ router.put(
  * @name GET /api/freets/:id
  *
  * @return {util.FreetResponse} - An object with freet info
+ * @throws {400} - If freetId is empty
  * @throws {404} - If no freet object with freet id id exists
  *
  */
 router.get(
   '/:freetId?',
   [
+    freetValidator.nullFreet,
     freetValidator.isFreetExists,
   ],
   async (req: Request, res: Response) => {

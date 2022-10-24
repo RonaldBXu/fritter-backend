@@ -11,11 +11,11 @@ type CooldownResponse = {
 };
 
 /**
- * Transform a raw Credit object from the database into an object
+ * Transform a raw Cooldown object from the database into an object
  * with all the information needed by the frontend
  * (in this case, removing the password for security)
  *
- * @param {HydratedDocument<Credit>} credit - A credit object
+ * @param {HydratedDocument<Cooldown>} cooldown - A credit object
  * @returns {CooldownResponse} - The user object without the password
  */
 const constructCooldownResponse = (cooldown: HydratedDocument<Cooldown>): CooldownResponse => {

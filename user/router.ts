@@ -160,12 +160,14 @@ router.delete(
  * @name GET /api/users/:id
  *
  * @return {util.UserResponse} - An object with user info
+ * @throws {400} If userId is empty
  * @throws {404} - If no user object with user id id exists
  *
  */
  router.get(
   '/:userId?',
   [
+    userValidator.nullUser,
     userValidator.doesUserExist,
   ],
   async (req: Request, res: Response) => {

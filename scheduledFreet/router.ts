@@ -3,6 +3,7 @@ import express from 'express';
 import ScheduledFreetCollection from './collection';
 import * as userValidator from '../user/middleware';
 import * as scheduledFreetValidator from '../scheduledFreet/middleware';
+import * as freetValidator from '../freet/middleware';
 import * as util from './util'
 import UserCollection from '../user/collection';
 
@@ -56,6 +57,7 @@ router.get(
  * @param {string} content - The content of the freet
  * @param {Date} publish_date
  * @return {util.ScheduledFreetResponse} - The created freet
+ * @throws {400} - If publish_date is empty
  * @throws {403} - If the user is not logged in
  * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {413} - If the freet content is more than 140 characters long
@@ -86,6 +88,7 @@ router.post(
  * @name DELETE /api/scheduledfreets/:id
  *
  * @return {string} - A success message and the "deleted" freet
+ * @throws {400} - If freetId is empty
  * @throws {403} - If the user is not logged in or is not the author of
  *                 the freet
  * @throws {404} - If the freetId is not valid
@@ -93,6 +96,7 @@ router.post(
 router.delete(
   '/:freetId?',
   [
+    freetValidator.nullFreet,
     userValidator.isUserLoggedIn,
     scheduledFreetValidator.isScheduledFreetExists,
     scheduledFreetValidator.isValidScheduledFreetModifier
@@ -114,6 +118,7 @@ router.delete(
  * @param {string} content - the new content for the freet
  * @param {Date} publish_date - the new publish date for the freet
  * @return {FreetResponse} - the updated freet
+ * @throws {400} - If freetId is empty
  * @throws {403} - if the user is not logged in or not the author of
  *                 of the freet
  * @throws {404} - If the freetId is not valid
@@ -123,6 +128,7 @@ router.delete(
 router.put(
   '/:freetId?',
   [
+    freetValidator.nullFreet,
     userValidator.isUserLoggedIn,
     scheduledFreetValidator.isScheduledFreetExists,
     scheduledFreetValidator.isValidScheduledFreetModifier,

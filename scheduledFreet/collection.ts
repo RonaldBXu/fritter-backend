@@ -32,7 +32,7 @@ class ScheduledFreetCollection {
    * @param {string} scheduledFreetId - The id of the scheduled freet to find
    * @return {Promise<HydratedDocument<Freet>> | Promise<null> } - The freet with the given scheduledFreetId, if any
    */
-  static async findOne(scheduledFreetId: Types.ObjectId | string): Promise<HydratedDocument<ScheduledFreet>> {
+  static async findOne(scheduledFreetId: string): Promise<HydratedDocument<ScheduledFreet>> {
     return ScheduledFreetModel.findOne({ _id: scheduledFreetId });
   }
 

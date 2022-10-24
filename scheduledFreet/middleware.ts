@@ -7,8 +7,17 @@ import * as util from './util'
  * Checks if a freet with scheduledFreetId in req.params exists
  */
 const isScheduledFreetExists = async (req: Request, res: Response, next: NextFunction) => {
-  const scheduledFreet = await ScheduledFreetCollection.findOne(req.params.freetId);
-  if (!scheduledFreet) {
+  try {
+    const scheduledFreet = await ScheduledFreetCollection.findOne(req.params.freetId);
+    if (!scheduledFreet) {
+      res.status(404).json({
+        error: {
+          scheduledFreetNotFound: `ScheduledFreet with freet ID ${req.params.freetId} does not exist.`
+        }
+      });
+      return;
+    }
+  } catch (e) {
     res.status(404).json({
       error: {
         scheduledFreetNotFound: `ScheduledFreet with freet ID ${req.params.freetId} does not exist.`
@@ -63,7 +72,13 @@ const isValidScheduledFreetModifier = async (req: Request, res: Response, next: 
  * Checks if the publish_date is valid in req.params
  */
 const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
-  if (!util.validDate(req.body.publish_date)){
+  if (!req.body.publish_date) {
+    res.status(400).json({
+      error: 'Please enter a date.'
+    });
+    return;
+  }
+  if (!util.validDate(req.body.publish_date)) {
     res.status(412).json({
       error: 'Please enter date in MM-DD-YYYY format.'
     });

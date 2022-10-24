@@ -13,6 +13,7 @@ const router = express.Router();
  * @name GET /api/reflections?id=userId&public=public
  *
  * @return {Array<util.ReflectionResponse>} - An object with reflections
+ * @throws {400} - If id or public are empty
  * @throws {403} - If the user is not logged in or if the user cannot view this reflection.
  * @throws {404} - If the user is not found.
  * 
@@ -20,6 +21,7 @@ const router = express.Router();
  router.get(
   '/',
   [
+    reflectionValidator.nullGet,
     userValidator.isUserLoggedIn,
     reflectionValidator.doesUserExist,
     reflectionValidator.canViewReflections,
@@ -41,9 +43,10 @@ const router = express.Router();
 /**
  * Edit a reflection
  *
- * @name PUT /api/credits/:id?
+ * @name PUT /api/reflections/:reflectionId?
  *
- * @return {credit: util.CreditResponse, otherCredit: util.CreditResponse} - An object with updated credit and otherCredit objects
+ * @return {util.ReflectionResponse} - An object with updated reflection
+ * @throws {400} - If reflectionId is empty
  * @throws {403} - If no user is logged in or if this reflection is not associated with the logged in user
  * @throws {404} - If the reflection is not found.
  * 
@@ -51,6 +54,7 @@ const router = express.Router();
  router.put(
   '/:reflectionId?',
   [
+    reflectionValidator.nullRefId,
     userValidator.isUserLoggedIn,
     reflectionValidator.doesReflectionExist,
     reflectionValidator.validModifier,
@@ -58,7 +62,7 @@ const router = express.Router();
   async (req: Request, res: Response) => {
     const reflection = await ReflectionCollection.updateReflection(req.params.reflectionId, req.body.public==='yes');
     res.status(200).json({
-      message: 'Credit updated successfully.',
+      message: 'reflection updated successfully.',
       reflection: util.constructReflectionResponse(reflection),
     });
   }

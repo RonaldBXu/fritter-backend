@@ -1,5 +1,5 @@
-import type {Request, Response, NextFunction} from 'express';
-import {Types} from 'mongoose';
+import type { Request, Response, NextFunction } from 'express';
+import { Types } from 'mongoose';
 import FreetCollection from '../freet/collection';
 
 /**
@@ -25,7 +25,7 @@ const isFreetExists = async (req: Request, res: Response, next: NextFunction) =>
  * spaces and not more than 140 characters
  */
 const isValidFreetContent = (req: Request, res: Response, next: NextFunction) => {
-  const {content} = req.body as {content: string};
+  const { content } = req.body as { content: string };
   if (!content.trim()) {
     res.status(400).json({
       error: 'Freet content must be at least one character long.'
@@ -62,8 +62,8 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
 /**
  * Checks if the replying id is valid, if it exists
  */
- const isValidReplyingFreet = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.body.replyingTo){
+const isValidReplyingFreet = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.replyingTo) {
     const validFormat = Types.ObjectId.isValid(req.body.replyingTo);
     const freet = validFormat ? await FreetCollection.findOne(req.body.replyingTo) : '';
     if (!freet) {
@@ -79,9 +79,27 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
   next();
 };
 
+/**
+ * Checks if the freetId is null
+ */
+const nullFreet = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.params.freetId) {
+
+    res.status(400).json({
+      error: {
+        nullFreet: 'freetId is empty'
+      }
+    });
+    return;
+  }
+
+  next();
+};
+
 export {
   isValidFreetContent,
   isFreetExists,
   isValidFreetModifier,
   isValidReplyingFreet,
+  nullFreet
 };

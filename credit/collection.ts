@@ -2,6 +2,7 @@ import type { HydratedDocument, Types } from 'mongoose';
 import UserCollection from '../user/collection';
 import type { Credit } from './model';
 import CreditModel from './model';
+import * as util from './util';
 
 /**
  * This file contains a class with functionality to interact with credits stored
@@ -64,7 +65,7 @@ class CreditCollection {
     */
   static async updateInflam(uid: Types.ObjectId): Promise<HydratedDocument<Credit>> {
     const credit = await CreditModel.findOne({ associated_user: uid });
-    credit.credit = (credit.credit as number) * 0.9;
+    credit.credit = util.roundTenth((credit.credit as number) * 0.9);
     await credit.save();
     return credit;
   }
@@ -77,7 +78,7 @@ class CreditCollection {
     */
   static async updateNotInflam(uid: Types.ObjectId): Promise<HydratedDocument<Credit>> {
     const credit = await CreditModel.findOne({ associated_user: uid });
-    credit.credit = (credit.credit as number) * 1.11;
+    credit.credit = util.roundTenth((credit.credit as number) * 1.11);
     await credit.save();
     return credit;
   }

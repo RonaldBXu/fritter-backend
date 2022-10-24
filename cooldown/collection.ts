@@ -1,8 +1,11 @@
-import CreditCollection from 'credit/collection';
-import FreetCollection from 'freet/collection';
+import CreditCollection from '../credit/collection';
+import FreetCollection from '../freet/collection';
 import type { HydratedDocument, Types } from 'mongoose';
 import type { Cooldown } from './model';
 import CooldownModel from './model';
+
+const PROVOCATIVE_THRESHOLD = 0.5;
+const INITIAL_VIEWS = 50;
 
 /**
  * This file contains a class with functionality to interact with cooldowns stored
@@ -20,7 +23,7 @@ class CooldownCollection {
    * @return {Promise<HydratedDocument<Credit>>} - The newly created cooldown
    */
   static async addOne(fid: Types.ObjectId): Promise<HydratedDocument<Cooldown>> {
-    const cooldown = new CooldownModel({ associated_freet: fid, provocative: [], views: [] });
+    const cooldown = new CooldownModel({ associated_freet: fid, provocative: [], views: [], inflammatory_designation: false});
     await cooldown.save(); // Saves user to MongoDB
     return cooldown;
   }
@@ -54,17 +57,18 @@ class CooldownCollection {
    * @param {boolean} provocative - If this user marked the freet as provocative or not.
    * @return {Promise<HydratedDocument<Cooldown>>} - The updated cooldown
    */
-  static async updateCooldown(uid: Types.ObjectId, fid: Types.ObjectId, provocative: boolean): Promise<HydratedDocument<Cooldown>> {
+  static async updateCooldown(uid: Types.ObjectId, fid: string, provocative: boolean): Promise<HydratedDocument<Cooldown>> {
     const cooldown = await CooldownModel.findOne({ associated_freet: fid });
     if (!cooldown.views.includes(uid)) cooldown.views.push(uid);
     if (provocative && !cooldown.provocative.includes(uid)) cooldown.provocative.push(uid);
+    if (!provocative && cooldown.provocative.includes(uid)) cooldown.provocative.splice(cooldown.provocative.indexOf(uid), 1);
     const numViews = cooldown.views.length + 1;
     const numProv = provocative ? cooldown.provocative.length + 1 : cooldown.provocative.length;
     const provRatio = numProv/numViews;
-    if (!cooldown.inflammatory_designation && cooldown.views.length > 50 && provRatio > 0.5){
+    if (!cooldown.inflammatory_designation && cooldown.views.length > INITIAL_VIEWS && provRatio > PROVOCATIVE_THRESHOLD){
       cooldown.inflammatory_designation = true;
       await CreditCollection.updateInflam((await FreetCollection.findOne(fid)).authorId);
-    } else if (cooldown.inflammatory_designation && cooldown.views.length > 50 && provRatio <= 0.5){
+    } else if (cooldown.inflammatory_designation && cooldown.views.length > INITIAL_VIEWS && provRatio <= PROVOCATIVE_THRESHOLD){
       cooldown.inflammatory_designation = false;
       await CreditCollection.updateNotInflam((await FreetCollection.findOne(fid)).authorId);
     }

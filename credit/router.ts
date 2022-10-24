@@ -13,12 +13,14 @@ const router = express.Router();
  * @name GET /api/credits/:id
  *
  * @return {util.CreditResponse} - An object with your credit
+ * @throws {400} - If userId is empty
  * @throws {404} - If no credit object with associated user id id exists
  *
  */
  router.get(
   '/:userId?',
   [
+    creditValidator.doesIdExist,
     creditValidator.doesCreditExist,
   ],
   async (req: Request, res: Response) => {
@@ -37,6 +39,7 @@ const router = express.Router();
  * @name PUT /api/credits/:other_username
  *
  * @return {credit: util.CreditResponse, otherCredit: util.CreditResponse} - An object with updated credit and otherCredit objects
+ * @throws {400} - If other_username is empty
  * @throws {403} - If no user is logged in
  * @throws {404} - If user who is giving/removing credit or user whose credit is changing is not found
  * @throws {412} - If user who is giving/removing credit the same as the user whose credit is changing

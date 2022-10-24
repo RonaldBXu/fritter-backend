@@ -156,7 +156,7 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
 /**
  * Checks if a user object with user id id exists
  */
- const doesUserExist = async (req: Request, res: Response, next: NextFunction) => {
+const doesUserExist = async (req: Request, res: Response, next: NextFunction) => {
   let user = undefined;
   if (req.params.userId) {
     user = await UserCollection.findOneByUserId(req.params.userId);
@@ -172,6 +172,19 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
   next();
 };
 
+/**
+ * Checks if userId is empty
+ */
+const nullUser = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.params.userId) {
+    res.status(400).json({
+      error: 'userId must be nonempty.'
+    });
+    return;
+  }
+  next();
+}
+
 export {
   isCurrentSessionUserExists,
   isUserLoggedIn,
@@ -182,4 +195,5 @@ export {
   isValidUsername,
   isValidPassword,
   doesUserExist,
+  nullUser,
 };

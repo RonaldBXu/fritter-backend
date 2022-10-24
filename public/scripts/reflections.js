@@ -12,7 +12,7 @@ function editReflection(fields) {
 }
 
 function getUserReflections(fields) {
-  fetch(`/api/reflections?id=${fields.id}?public=${fields.public}`)
+  fetch(`/api/reflections?id=${fields.id}&public=${fields.public}`)
     .then(showResponse)
     .catch(showResponse);
 }

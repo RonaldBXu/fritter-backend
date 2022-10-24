@@ -1,5 +1,5 @@
-import type {HydratedDocument, Types} from 'mongoose';
-import type {Credit} from './model';
+import type { HydratedDocument, Types } from 'mongoose';
+import type { Credit } from './model';
 
 // Update this if you add a property to the Credit type!
 type CreditResponse = {
@@ -31,7 +31,19 @@ const constructCreditResponse = (credit: HydratedDocument<Credit>): CreditRespon
   };
 };
 
+
+/**
+ * round to nearest 10th
+ *
+ * @param {number} num - number to round
+ * @returns {number} - num rounded to 0.1
+ */
+const roundTenth = (num: number): number => {
+  return Math.round(num * 10) / 10
+};
+
 export {
   constructCreditResponse,
   CreditResponse,
+  roundTenth,
 };
