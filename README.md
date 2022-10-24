@@ -203,6 +203,7 @@ This renders the `index.html` file that will be used to interact with the backen
 **Body**
 
 - `content` _{string}_ - The content of the freet
+- `replyingTo` _{string}_ (Optional) - The id of the freet that this freet is replying to.
 
 **Returns**
 
@@ -211,8 +212,9 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
-- `403` if the user is not logged in
 - `400` if the freet content is empty or a stream of empty spaces
+- `403` if the user is not logged in
+- `404` if the freet this one is replying to does not exist
 - `413` if the freet content is more than 140 characters long
 
 <br>
@@ -225,9 +227,23 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
+- `400` if `freetId` is empty
 - `403` if the user is not logged in
 - `403` if the user is not the author of the freet
-- `404` if the freetId is invalid
+- `404` if the freetId is not found
+
+<br>
+
+#### `GET /api/freets/:freetId?` - Get an existing freet
+
+**Returns**
+
+- A freet with freet id freetId
+
+**Throws**
+
+- `400` if `freetId` is empty
+- `404` if the freetId is not found
 
 <br>
 
@@ -244,10 +260,11 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
-- `403` if the user is not logged in
-- `404` if the freetId is invalid
-- `403` if the user is not the author of the freet
+- `400` if `freetId` is empty
 - `400` if the new freet content is empty or a stream of empty spaces
+- `403` if the user is not logged in
+- `403` if the user is not the author of the freet
+- `404` if the freetId is not found
 - `413` if the new freet content is more than 140 characters long
 
 <br>
@@ -268,9 +285,9 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
-- `403` if the user is already logged in
-- `400` if username or password is not in correct format format or missing in the req
+- `400` if username or password is not in correct format format or missing in the request
 - `401` if the user login credentials are invalid
+- `403` if the user is already logged in
 
 <br>
 
@@ -300,8 +317,8 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
-- `403` if there is a user already logged in
 - `400` if username or password is in the wrong format
+- `403` if there is a user already logged in
 - `409` if username is already in use
 
 <br>
@@ -320,8 +337,8 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **Throws**
 
-- `403` if the user is not logged in
 - `400` if username or password is in the wrong format
+- `403` if the user is not logged in
 - `409` if the username is already in use
 
 <br>
@@ -338,49 +355,37 @@ This renders the `index.html` file that will be used to interact with the backen
 
 <br>
 
-#### `GET /api/users` - Get a user object
-
-**Body**
-
-- `user_id` _{string}_ - The associated user id of the credit object to get
+#### `GET /api/users/:userId?` - Get a user object
 
 **Returns**
 
-- A user object with userId `user_id`
+- A user object with userId `userId`
 
 **Throws**
 
-- `400` if `user_id` is not given
-- `404` if the user with `user_id` does not exist
+- `400` if `userId` is empty
+- `404` if the user with `userId` does not exist
 
 <br>
 
 ### Credits API Routes
 
-We do not have (nor need) as POST route for Credits. This is because Credits are initialized when a User is created, so it (Credits) only needs to be updated or fetched.
+We do not have (nor need) a POST route for Credits. This is because Credits are initialized when a User is created, so it (Credits) only needs to be updated or fetched.
 
-#### `GET /api/credits` - Get a credit object
-
-**Body**
-
-- `user_id` _{string}_ - The associated user id of the credit object to get
+#### `GET /api/credits/:userId?` - Get a credit object
 
 **Returns**
 
-- A credit object with associated user `user_id`
+- A credit object with associated user `userId`
 
 **Throws**
 
-- `400` if `user_id` is not given
-- `404` if the credit object with associated user `user_id` does not exist
+- `400` if `userId` is empty
+- `404` if the credit object with associated user `userId` does not exist
 
 <br>
 
-#### `PUT /api/credits` - Give or take away credit
-
-**Body**
-
-- `other_username` _{string}_ - the username of the user receiving/losing credit
+#### `PUT /api/credits/:otherUserId?` - Give or take away credit
 
 **Returns**
 
@@ -389,42 +394,36 @@ We do not have (nor need) as POST route for Credits. This is because Credits are
 
 **Throws**
 
+- `400` if `otherUserId` is empty
 - `403` if the user is not logged in
-- `404` if either of the users credit object is not found
+- `404` if either of the users credit objects are not found
 - `412` if the user who is giving/removing credit is the same as the user whose credit is changing
 
 <br>
 
 ### Cooldowns API Routes
 
-We do not have (nor need) as POST route for Cooldowns. This is because Cooldowns are initialized when a Freet is created, so it (Cooldowns) only needs to be updated or fetched.
+We do not have (nor need) a POST route for Cooldowns. This is because Cooldowns are initialized when a Freet is created, so it (Cooldowns) only needs to be updated or fetched.
 
-#### `GET /api/cooldowns` - Get a cooldown object
-
-**Body**
-
-- `freet_id` _{string}_ - The associated freet id of the cooldown object to get
+#### `GET /api/cooldowns/:freetId?` - Get a cooldown object
 
 **Returns**
 
-- A cooldown object with associated freet `freet_id`
+- A cooldown object with associated freet `freetId`
 
 **Throws**
 
-- `400` if `freet_id` is not given
-- `404` if the cooldown object with associated freet `freet_id` does not exist
+- `400` if `freetId` is empty
+- `404` if the cooldown object with associated freet `freetId` does not exist
 
 <br>
 
-#### `PUT /api/cooldowns` - Modify a cooldown object
+#### `PUT /api/cooldowns/:freetId?` - Modify a cooldown object
 
 **Body**
 
-- `freet_id` _{string}_ - the id of the freet being accessed
 - `viewing_user` _{string}_ - the id of the user viewing the freet
-- `provocative` _{boolean}_ - true iff the user marked the associated freet as provocative
-
-Note: Database contains 2 arrays: One of all viewed users, and one of all users that marked this freet as provocative.
+- `provocative` _{string}_ - 'yes' iff the user marked the associated freet as provocative
 
 **Returns**
 
@@ -433,31 +432,37 @@ Note: Database contains 2 arrays: One of all viewed users, and one of all users 
 
 **Throws**
 
+- `400` if `freetId` is empty
 - `403` if the user is not logged in
-- `404` if either of the users credit object is not found
+- `404` if the freet is not found
 
 <br>
 
 ### Scheduled Freets API Routes
 
-#### `GET /api/scheduledFreets` - Get a scheduled freet object
-
-**Body**
-
-- `scheduledFreet_id` _{string}_ - The scheduled freet id of the scheduled freet to get
+#### `GET /api/scheduledfreets` - Get all scheduled freets
 
 **Returns**
 
-- A scheduled freet object with id `scheduledFreet_id`
-
-**Throws**
-
-- `400` if `scheduledFreet_id` is not given
-- `404` if the scheduled freet with id `scheduledFreet_id` does not exist
+- All scheduled freet objects
 
 <br>
 
-#### `POST /api/scheduledFreets` - Create a new scheduled freet
+#### `GET /api/scheduledfreets?author=USERNAME` - Get all scheduled freets for a user
+
+**Returns**
+
+- An array of scheduled freets created by user with username `author`
+
+**Throws**
+
+- `400` if `author` is not given
+- `404` if `author` is not a recognized username of any user
+
+
+<br>
+
+#### `POST /api/scheduledfreets` - Create a new scheduled freet
 
 **Body**
 
@@ -471,30 +476,65 @@ Note: Database contains 2 arrays: One of all viewed users, and one of all users 
 
 **Throws**
 
-- `403` if the user is not logged in
+- `400` if `publish_date` is empty
 - `400` if the freet content is empty or a stream of empty spaces
+- `403` if the user is not logged in
 - `412` if the publish date is in the past
 - `413` if the freet content is more than 140 characters long
 
 <br>
 
-### Reflections API Routes
-
-#### `GET /api/reflection` - Get a reflection object
+#### `PUT /api/scheduledfreets/:scheduledFreetId?` - Edit a scheduled freet
 
 **Body**
 
-- `freet_id` _{string}_ - The freet id associated with this reflection
-- `user_id` _{string}_ - The username of the user associated with this reflection
+- `content` _{string}_ - The content of the freet
+- `publish_date` _{date}_ - The publish date of this freet
 
 **Returns**
 
-- A reflection object with associated freet id `freet_id` and associated user id `user_id`
+- A success message
+- An object with the created scheduled freet
 
 **Throws**
 
-- `400` if `freet_id` or `user_id` is not given
-- `404` if the freet object with associated user `user_id` and `freet_id` does not exist
+- `400` if the `scheduledFreetId` is empty
+- `400` if the freet content is empty or a stream of empty spaces
+- `403` if the user is not logged in
+- `404` if the scheduled freet object cannot be found
+- `412` if the publish date is in the past
+- `413` if the freet content is more than 140 characters long
+
+<br>
+
+#### `DELETE /api/scheduledfreets/:scheduledFreetId?` - Delete a scheduled freet
+
+**Returns**
+
+- A success message
+
+**Throws**
+
+- `400` if the `scheduledFreetId` is empty
+- `403` if the user is not logged in
+- `403` if the user is not the author of the scheduled freet
+- `404` if the scheduledFreetId is invalid
+
+<br>
+
+### Reflections API Routes
+
+#### `GET /api/reflections?id=userId&public=public` - Get user's reflections
+
+**Returns**
+
+- Reflections with associated user id `userId` with a status of `public`.
+
+**Throws**
+
+- `400` if `id` or `public` are empty
+- `403` if the user tries to access another user's private reflections or if the user is not logged in.
+- `404` if the user object with user id `userId` does not exist
 
 <br>
 
@@ -513,16 +553,15 @@ Note: Database contains 2 arrays: One of all viewed users, and one of all users 
 
 **Throws**
 
-- `403` if the user is not logged in
 - `400` If the reflection content is empty or a stream of empty spaces
+- `403` if the user is not logged in
 
 <br>
 
-#### `PUT /api/reflections` - Change the visibility of a reflection
+#### `PUT /api/reflections/:reflectionId?` - Change the visibility of a reflection
 
 **Body**
 
-- `reflection_id` _{string}_ - The id of the reflection being edited
 - `public` _{boolean}_ - Whether user wants the reflection to be publicly viewable or not
 
 **Returns**
@@ -532,4 +571,6 @@ Note: Database contains 2 arrays: One of all viewed users, and one of all users 
 
 **Throws**
 
-- `403` if the user is not logged in
+- `400` if `reflectionId` is empty
+- `403` if the user is not logged in or if this reflection is not associated with the currently logged in user
+- `404` if the reflection is not found
