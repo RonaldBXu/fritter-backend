@@ -2,6 +2,7 @@ import type { HydratedDocument, Types } from 'mongoose';
 import UserCollection from '../user/collection';
 import type { ScheduledFreet } from './model';
 import ScheduledFreetModel from './model';
+import moment from 'moment';
 
 /**
  * This files contains a class that has the functionality to explore freets
@@ -20,8 +21,8 @@ class ScheduledFreetCollection {
    * @param {string} content - The id of the content of the freet
    * @return {Promise<HydratedDocument<Freet>>} - The newly created freet
    */
-  static async addOne(associated_user: Types.ObjectId, content: string, publish_date: Date): Promise<HydratedDocument<ScheduledFreet>> {
-    const scheduledFreet = new ScheduledFreetModel({ associated_user: associated_user, content: content, publish_date: publish_date });
+  static async addOne(associated_user: Types.ObjectId, content: string, publish_date: string): Promise<HydratedDocument<ScheduledFreet>> {
+    const scheduledFreet = new ScheduledFreetModel({ associated_user: associated_user, content: content, publish_date: moment(publish_date, "MM-DD-YYYY hh:mm a").toDate() });
     await scheduledFreet.save(); // Saves freet to MongoDB
     return scheduledFreet;
   }

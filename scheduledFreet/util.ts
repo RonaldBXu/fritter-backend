@@ -34,7 +34,7 @@ const formatStringToDate = (date: string): Date => moment(date).toDate();
 */
 const validDate = (date: string): boolean => {
   
-  const testDate = moment(date, "MM-DD-YYYY", true)
+  const testDate = moment(date, "MM-DD-YYYY HH:mm", true)
   return !(testDate == null || !testDate.isValid())
 }
 

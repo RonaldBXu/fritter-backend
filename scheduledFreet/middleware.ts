@@ -80,7 +80,7 @@ const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
   }
   if (!util.validDate(req.body.publish_date)) {
     res.status(412).json({
-      error: 'Please enter date in MM-DD-YYYY format.'
+      error: 'Please enter date in <MM-DD-YYYY HH:mm> format (military time). Example: 12-18-2022 15:45'
     });
     return;
   }
