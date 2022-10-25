@@ -74,7 +74,7 @@ router.post(
     const scheduledFreet = await ScheduledFreetCollection.addOne(user._id, req.body.content, req.body.publish_date);
 
     res.status(201).json({
-      message: 'Your scheduled freet was created successfully.',
+      message: 'Your scheduled freet was created successfully. Please note that the MongoDB trigger for publishing scheduled freets runs once every 2 minutes.',
       scheduledFreet: util.constructScheduledFreetResponse(scheduledFreet)
     });
     return;
