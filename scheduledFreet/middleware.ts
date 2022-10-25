@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import ScheduledFreetCollection from './collection';
 import * as util from './util'
 
-const TIME_OFFSET = 18000;
+const TIME_OFFSET = 18000000;
 
 /**
  * Checks if a freet with scheduledFreetId in req.params exists
@@ -88,9 +88,11 @@ const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
   }
   const date = util.formatStringToDate(req.body.publish_date);
   const currDate = util.today();
-  if (date.getTime() < (currDate.getTime() - TIME_OFFSET)) {
+  const proposedTimeAdj = date.getTime() + TIME_OFFSET;
+  const currTime = currDate.getTime();
+  if (proposedTimeAdj < currTime) {
     res.status(412).json({
-      error: 'Publish date is in the past. (Please enter a time at least 5 minutes ahead of the current time.)'
+      error: 'Publish date is in the past.'
     });
     return;
   }
