@@ -86,7 +86,7 @@ const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
   }
   const date = util.formatStringToDate(req.body.publish_date);
   const currDate = util.today();
-  if (date.getTime() <= currDate.getTime()) {
+  if (date.getTime() < currDate.getTime()) {
     res.status(412).json({
       error: 'Publish date is in the past. (Please enter a time at least 5 minutes ahead of the current time.)'
     });
